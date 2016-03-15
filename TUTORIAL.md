@@ -20,7 +20,9 @@ Before you begin, ensure you have the following installed or running:
 
 **Note**: If you are running CloudBees Jenkins Enterprise 14.11 or later, you already have Pipeline (plus additional associated features).
 
-If you want to play with Pipeline without installing Jenkins separately (or accessing your production system), try running the [Docker demo](demo/README.md).
+We will play with Pipeline without installing Jenkins separately and run the [Docker demo](DEMO.md).
+
+_Windows? Je vindt je Jenkins waarschijnlijk op http://192.168.99.100:8080/manage ._
 
 # Creating a Pipeline
 
@@ -33,6 +35,7 @@ The _Script_ text area is important as this is where your Pipeline script is def
 ```groovy
 echo 'hello from Pipeline'
 ```
+_Onderstaand is niet van toepassing op onze docker jenkins: je bent administrator. In het echte leven ben je dat misschien niet, dus zet maar aan, dan weet je straks wat je wel en niet kunt._
 **Note**: if you are not a Jenkins administrator, click the **Use Groovy Sandbox** option (read [here](https://wiki.jenkins-ci.org/display/JENKINS/Script+Security+Plugin#ScriptSecurityPlugin-GroovySandboxing) to learn more about this option).
 
 2. **Save** your pipeline when you are done.
@@ -85,11 +88,9 @@ The following sections guide you through creating a simple Pipeline.
 To set up for creating a Pipeline, ensure you have the following:
 
 1. First, you need a Maven installation available to do builds with.
-Go to _Jenkins » Manage Jenkins » Configure System_, click **Add Maven**, give it the name **M3** and allow it to install automatically.
+Go to _Jenkins » Manage Jenkins » Configure System_, click **Maven installations**, **Delete Maven**, **Add Maven**, give it the name **M3** and allow it to install automatically.
 
-2. Only if you do not have Git installed on your Jenkins server: click **Delete Git** on the default Git installation and _Add Git » JGit_ to replace it.
-
-3. Click **Save**.
+2. Click **Save**.
 
 ## Checking out and Building Sources
 
@@ -111,22 +112,6 @@ If they fail, the `mvn` command will fail and your Pipeline run will end with:
 ```
 ERROR: script returned exit code 1
 Finished: FAILURE
-```
-
-### Modifying for Windows Variations
-
-This documentation assumes Jenkins is running on Linux or another Unix-like operating system. If your Jenkins server (or, later, slave) is running on Windows, try using `bat` in place of `sh`, and use backslashes as the file separator where needed (backslashes do generally need to be escaped inside strings).
-
-**Example**: rather than:
-
-```groovy
-sh "${mvnHome}/bin/mvn -B verify"
-```
-
-you could use:
-
-```groovy
-bat "${mvnHome}\\bin\\mvn -B verify"
 ```
 
 ## Understanding Syntax
@@ -329,18 +314,19 @@ node('master') {
 
 Here, you pass a value for the optional `label` parameter of the step, as well as a body block.
 
-To create a simple slave:
+To create a mock slave:
 
-1.  Select _Manage Jenkins » Manage Nodes » New Node_ and create a _Dumb Slave_.
+_Als je zelf linux/mac draait, of handiger met docker bent dan ik, kan je ook een echte remote slave maken ipv de mock slave, zie daarvoor https://github.com/jenkinsci/workflow-plugin/blob/master/TUTORIAL.md ._
+
+
+1.  Select _Manage Jenkins » Manage Nodes » New Node_ and create a _Mock Slave_.
 Leave _# of executors_ as 1.
 
-2. Pick a **Remote root directory** such as `/tmp/slave`.
+2. Enter `remote` in the **Labels** field.
 
-3. Enter `remote` in the **Labels** field and set the _Launch method_ to _Launch slave agents via Java Web Start_.
+3. **Save**, then click on the new slave and **Launch**.
 
-4. **Save**, then click on the new slave and **Launch**.
-
-5. Now, go back to your Pipeline definition and request this slave’s label:
+4. Now, go back to your Pipeline definition and request this slave’s label:
 
 ```groovy
 node('remote') {
